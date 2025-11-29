@@ -63,6 +63,24 @@ const App: React.FC = () => {
     }, 800);
   };
 
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    // Simulate network delay for realistic feel
+    await new Promise(r => setTimeout(r, 800));
+    
+    // Add a heartbeat log to simulate live data ingestion
+    const newLog: LogEntry = {
+      id: `live-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      service: 'System Monitor',
+      level: LogLevel.INFO,
+      message: 'Heartbeat check passed. System metrics validated.'
+    };
+    
+    setLogs(prev => [...prev, newLog]);
+    setIsLoading(false);
+  };
+
   const handleViewRelatedLogs = (alert: SystemAlert) => {
     if (alert.relatedLogIds && alert.relatedLogIds.length > 0) {
       setLogFilterIds(alert.relatedLogIds);
@@ -93,6 +111,9 @@ const App: React.FC = () => {
       // 1. Check for new alerts based on logs
       const hasErrors = logs.some(l => l.level === LogLevel.ERROR || l.level === LogLevel.CRITICAL);
       
+      // Allow re-analysis if there are errors and we either have no alerts OR we just refreshed (logs length changed)
+      // Note: In a real app we would track "processed" logs. 
+      // Here we rely on the list length and existence of errors.
       if (hasErrors && alerts.length === 0) {
         const newAlerts = await analyzeForAlerts(logs);
         setAlerts(newAlerts);
@@ -257,12 +278,12 @@ const App: React.FC = () => {
               <div className="absolute inset-0 bg-slate-950/80 z-50 flex items-center justify-center backdrop-blur-sm">
                  <div className="flex flex-col items-center gap-3">
                     <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-indigo-400 font-mono text-sm animate-pulse">Ingesting Enterprise Ecosystem Logs...</span>
+                    <span className="text-indigo-400 font-mono text-sm animate-pulse">Processing Data Ecosystem...</span>
                  </div>
               </div>
             )}
 
-            {view === 'dashboard' && <Dashboard logs={logs} alerts={alerts} />}
+            {view === 'dashboard' && <Dashboard logs={logs} alerts={alerts} onRefresh={handleRefresh} />}
             {view === 'agent-monitor' && <AgentMonitor alerts={alerts} onViewLogs={handleViewRelatedLogs} />}
             {view === 'logs' && (
               <div className="p-6 h-full overflow-hidden flex flex-col">

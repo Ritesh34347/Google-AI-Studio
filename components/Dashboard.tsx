@@ -1,14 +1,15 @@
 import React, { useMemo } from 'react';
 import { LogEntry, SystemAlert, LogLevel } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
-import { Activity, AlertTriangle, CheckCircle, Server, ShieldCheck } from 'lucide-react';
+import { Activity, AlertTriangle, CheckCircle, Server, ShieldCheck, RefreshCw } from 'lucide-react';
 
 interface DashboardProps {
   logs: LogEntry[];
   alerts: SystemAlert[];
+  onRefresh: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ logs, alerts }) => {
+const Dashboard: React.FC<DashboardProps> = ({ logs, alerts, onRefresh }) => {
   
   const stats = useMemo(() => {
     const errorCount = logs.filter(l => l.level === LogLevel.ERROR || l.level === LogLevel.CRITICAL).length;
@@ -57,11 +58,20 @@ const Dashboard: React.FC<DashboardProps> = ({ logs, alerts }) => {
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full pb-20">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-100 flex items-center gap-2">
-          <Activity className="text-blue-500" /> Data Ecosystem Overview
-        </h1>
-        <p className="text-slate-400 mt-1">Real-time monitoring of Snowflake, Glue, SAP, Kafka, and more.</p>
+      <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-100 flex items-center gap-2">
+            <Activity className="text-blue-500" /> Data Ecosystem Overview
+          </h1>
+          <p className="text-slate-400 mt-1">Real-time monitoring of Snowflake, Glue, SAP, Kafka, and more.</p>
+        </div>
+        <button 
+          onClick={onRefresh}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition-all active:scale-95"
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span>Refresh Data</span>
+        </button>
       </header>
 
       {/* Stats Grid */}
