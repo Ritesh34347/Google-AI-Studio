@@ -1,0 +1,5 @@
+{
+  "name": "Sentinel DataOps Agent",
+  "description": "An autonomous AI-powered DataOps platform that ingests logs, monitors ecosystem health, performs self-healing actions, and provides a conversational interface for system queries.",
+  "requestFramePermissions": []
+}
